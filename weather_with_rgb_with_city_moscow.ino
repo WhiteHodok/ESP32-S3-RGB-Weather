@@ -65,12 +65,37 @@ void loop() {
 }
 
 void setPixelColor(int temp) {
-  float ratio = (float)(temp - minTemp) / (maxTemp - minTemp);
-
-  uint8_t red = map(ratio * 100, 0, 100, 0, 255);
-  uint8_t green = map(ratio * 100, 0, 100, 255, 0);
-  uint8_t blue = 255 - red;
-
-  pixels.setPixelColor(0, pixels.Color(red, green, blue));
+  if (temp == 0) {
+    // При 0°C устанавливаем зелёный цвет
+    pixels.setPixelColor(0, pixels.Color(0, 255, 0)); // Зелёный цвет (R=0, G=255, B=0)
+  } else if (temp > 0 && temp <= 13) {
+    // От 0°C до 13°C: плавный переход от зелёного к жёлтому
+    float ratio = (float)(temp - 0) / (13 - 0); // Нормализация в диапазоне 0-13
+    uint8_t red = map(ratio * 100, 0, 100, 0, 255); // Зелёный -> Жёлтый (R увеличивается)
+    uint8_t green = 255; // Зелёный остаётся максимальным
+    uint8_t blue = 0; // Синий отсутствует
+    pixels.setPixelColor(0, pixels.Color(red, green, blue));
+  } else if (temp > 13 && temp <= 25) {
+    // От 13°C до 25°C: плавный переход от жёлтого к красному
+    float ratio = (float)(temp - 13) / (25 - 13); // Нормализация в диапазоне 13-25
+    uint8_t red = 255; // Красный остаётся максимальным
+    uint8_t green = map(ratio * 100, 0, 100, 255, 0); // Зелёный уменьшается
+    uint8_t blue = 0; // Синий отсутствует
+    pixels.setPixelColor(0, pixels.Color(red, green, blue));
+  } else if (temp < 0 && temp >= -13) {
+    // От -13°C до 0°C: плавный переход от голубого к зелёному
+    float ratio = (float)(temp - (-13)) / (0 - (-13)); // Нормализация в диапазоне -13-0
+    uint8_t red = 0; // Красный отсутствует
+    uint8_t green = map(ratio * 100, 0, 100, 255, 255); // Зелёный остаётся максимальным
+    uint8_t blue = map(ratio * 100, 0, 100, 255, 0); // Синий уменьшается
+    pixels.setPixelColor(0, pixels.Color(red, green, blue));
+  } else if (temp < -13 && temp >= -25) {
+    // От -25°C до -13°C: плавный переход от синего к голубому
+    float ratio = (float)(temp - (-25)) / (-13 - (-25)); // Нормализация в диапазоне -25--13
+    uint8_t red = 0; // Красный отсутствует
+    uint8_t green = map(ratio * 100, 0, 100, 0, 255); // Зелёный увеличивается
+    uint8_t blue = 255; // Синий остаётся максимальным
+    pixels.setPixelColor(0, pixels.Color(red, green, blue));
+  }
   pixels.show();
 }
