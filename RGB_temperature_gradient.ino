@@ -29,12 +29,18 @@ void loop() {
 }
 
 void setPixelColor(int temp) {
-  float ratio = (float)(temp - minTemp) / (maxTemp - minTemp);
+  if (temp == 0) {
+    // При 0°C устанавливаем зелёный цвет
+    pixels.setPixelColor(0, pixels.Color(0, 255, 0)); // Зелёный цвет (R=0, G=255, B=0)
+  } else {
+    // Для других температур используем градиент
+    float ratio = (float)(temp - minTemp) / (maxTemp - minTemp);
 
-  uint8_t red = map(ratio * 100, 0, 100, 0, 255);
-  uint8_t green = map(ratio * 100, 0, 100, 255, 0);
-  uint8_t blue = 255 - red;
+    uint8_t red = map(ratio * 100, 0, 100, 0, 255);
+    uint8_t green = map(ratio * 100, 0, 100, 255, 0);
+    uint8_t blue = 255 - red;
 
-  pixels.setPixelColor(0, pixels.Color(red, green, blue));
+    pixels.setPixelColor(0, pixels.Color(red, green, blue));
+  }
   pixels.show();
 }
